@@ -30,11 +30,13 @@ namespace AlperenElbiz.DccBridge.Editor
             var report = new StringBuilder("DCC Bridge\n");
             foreach (var state in settings.Tools)
             {
-                var status = state.Usable ? "ready"
-                    : !state.Enabled ? "disabled"
-                    : "unavailable";
+                var status = !state.Enabled ? "disabled"
+                    : !state.Detected ? "not installed"
+                    : state.NeedsConnection && !state.Connected ? "not connected"
+                    : "ready";
 
-                report.AppendLine($"  {state.DisplayName,-14} {status,-12} {state.Version}");
+                var channel = state.NeedsConnection ? $"port {state.Port}" : string.Empty;
+                report.AppendLine($"  {state.DisplayName,-22} {status,-14} {state.Version} {channel}".TrimEnd());
                 if (state.Enabled && !string.IsNullOrEmpty(state.Problem))
                 {
                     report.AppendLine($"    {state.Problem}");

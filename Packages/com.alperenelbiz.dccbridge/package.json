@@ -1,8 +1,8 @@
 {
   "name": "com.alperenelbiz.dccbridge",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "displayName": "DCC Bridge",
-  "description": "Drives Blender and Photoshop from Unity to build game-ready assets: headless export with validation, palette atlases, seamless detail maps, and automatic material, prefab and collider assembly. Each tool is optional — the pipeline adapts to whichever ones you have.",
+  "description": "Drives Blender, Photoshop and Substance 3D Painter from Unity to build game-ready assets: headless export with validation, palette atlases, seamless detail maps, and material assembly. Every tool is optional \u2014 the pipeline adapts to whichever ones you have.",
   "unity": "6000.0",
   "author": {
     "name": "Alperen Elbiz",
@@ -13,6 +13,7 @@
     "pipeline",
     "blender",
     "photoshop",
+    "substance",
     "asset-pipeline",
     "automation",
     "dcc"

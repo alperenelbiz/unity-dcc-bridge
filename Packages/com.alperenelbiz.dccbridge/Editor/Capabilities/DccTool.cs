@@ -12,7 +12,15 @@ namespace AlperenElbiz.DccBridge.Editor
         Photoshop,
 
         /// <summary>A Python 3 runtime via uv, used by every generator that runs outside Unity.</summary>
-        Python
+        Python,
+
+        /// <summary>
+        /// Substance 3D Painter, driven through its remote scripting port.
+        ///
+        /// Appended rather than inserted: JsonUtility serialises an enum by its integer value,
+        /// so reordering these would silently reassign every already-saved project's settings.
+        /// </summary>
+        SubstancePainter
     }
 
     /// <summary>
@@ -37,20 +45,42 @@ namespace AlperenElbiz.DccBridge.Editor
         /// <summary>Set by discovery, not by the user.</summary>
         [NonSerialized] public bool Detected;
 
+        /// <summary>
+        /// For tools driven over a local port, whether that port is currently accepting
+        /// connections. Installed-but-not-listening is the common case and is worth naming:
+        /// the application is there, it just was not started with remote control enabled.
+        /// </summary>
+        [NonSerialized] public bool Connected;
+
         /// <summary>Version string when discovery could read one.</summary>
         [NonSerialized] public string Version = string.Empty;
 
         /// <summary>Why the tool is unusable, when it is.</summary>
         [NonSerialized] public string Problem = string.Empty;
 
+        /// <summary>Tools that are driven over a local port rather than by launching a binary.</summary>
+        public bool NeedsConnection => Tool is DccTool.Photoshop or DccTool.SubstancePainter;
+
+        /// <summary>The port its remote-control channel listens on, or 0.</summary>
+        public int Port => Tool switch
+        {
+            DccTool.Photoshop => 3001,          // adb-mcp plugin proxy
+            DccTool.SubstancePainter => 60041,  // --enable-remote-scripting
+            _ => 0
+        };
+
         /// <summary>Enabled, present, and with no reported problem.</summary>
         public bool Usable => Enabled && Detected && string.IsNullOrEmpty(Problem);
+
+        /// <summary>Usable and, for a port-driven tool, actually reachable right now.</summary>
+        public bool Ready => Usable && (!NeedsConnection || Connected);
 
         public string DisplayName => Tool switch
         {
             DccTool.Blender => "Blender",
             DccTool.Photoshop => "Photoshop",
             DccTool.Python => "Python (uv)",
+            DccTool.SubstancePainter => "Substance 3D Painter",
             _ => Tool.ToString()
         };
 
@@ -59,6 +89,7 @@ namespace AlperenElbiz.DccBridge.Editor
             DccTool.Blender => "Builds and exports 3D props, validates them before they reach Unity",
             DccTool.Photoshop => "Authors texture templates and exports their layers",
             DccTool.Python => "Runs the generators: palette atlases, detail maps, validation",
+            DccTool.SubstancePainter => "Paints and exports PBR texture sets for hero props",
             _ => string.Empty
         };
     }

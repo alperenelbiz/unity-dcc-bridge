@@ -1,8 +1,8 @@
 # DCC Bridge
 
-Drives Blender and Photoshop from Unity to build game-ready assets — headless export with
-validation, palette atlases, seamless detail maps, and (from 0.2.0) automatic material,
-prefab and collider assembly.
+Drives Blender, Photoshop and Substance 3D Painter from Unity to build game-ready assets —
+headless export with validation, palette atlases, seamless detail maps, and material
+assembly.
 
 **Every tool is optional.** Not everyone on a team can run Blender or owns Photoshop, so
 the pipeline adapts: you pick what you have, and only those features appear.
@@ -11,23 +11,34 @@ the pipeline adapts: you pick what you have, and only those features appear.
 
 - Unity 6000.0 or newer
 - `com.unity.pipeline` (installed automatically as a dependency)
-- Optional: Blender 4.2+, Photoshop, and [uv](https://docs.astral.sh/uv/) for the Python tools
+- Optional: Blender 4.2+, Photoshop, Substance 3D Painter, and
+  [uv](https://docs.astral.sh/uv/) for the Python tools
+
+### How the tools differ
+
+Blender runs **headless** — it is driven in batch with no window, so it can do bulk work.
+
+Photoshop and Substance do **not**. Both are driven over a local socket against a running
+application (ports 3001 and 60041), and both stay silent unless launched with remote
+control enabled. That makes them the place to author one of a kind, not to produce a
+thousand: use them to design a template or paint a hero prop, and let the headless
+generators mass-produce from what they export.
 
 ## Install
 
 Package Manager → **Add package from git URL**:
 
 ```
-https://github.com/alperenelbiz/unity-dcc-bridge.git?path=/Packages/com.alperenelbiz.dccbridge#v0.1.0
+https://github.com/alperenelbiz/unity-dcc-bridge.git?path=/Packages/com.alperenelbiz.dccbridge#v0.2.0
 ```
 
-Pin the tag. Without `#v0.1.0` you track the default branch and every fetch may bring
+Pin the tag. Without `#v0.2.0` you track the default branch and every fetch may bring
 breaking changes.
 
 To upgrade, change the tag and let the Package Manager re-resolve:
 
 ```
-...#v0.2.0
+...#v0.3.0
 ```
 
 ## First run

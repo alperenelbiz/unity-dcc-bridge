@@ -5,6 +5,35 @@ All notable changes to this package are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-09-21
+
+Adds Substance 3D Painter as a selectable tool, and teaches the capability system the
+difference between a tool being installed and being reachable.
+
+### Added
+
+- **Substance 3D Painter** in the tool list, detected across Adobe and Steam installs on
+  macOS and Windows.
+- **Connection state for socket-driven tools.** Photoshop and Substance are not launched as
+  executables; they are driven over a local port (3001 and 60041). Both stay silent unless
+  started with remote control enabled, so "installed" and "usable" are now separate states.
+  The UI reports `not connected` with the specific fix — for Substance, relaunch with
+  `--enable-remote-scripting`.
+
+### Fixed
+
+- Substance detection missed real installs. Adobe names its folder
+  `Adobe Substance 3D Painter <year>` while Steam uses `Substance 3D Painter <year>`, and
+  some installs carry no year at all. Found by probing an actual machine rather than
+  trusting the documented path.
+
+### Known limitations
+
+- Substance is detected and selectable, but no command drives it yet. Same for Photoshop.
+  Both are groundwork for the hero-prop path: Blender exports low and high poly, Substance
+  paints, Unity receives a metallic-smoothness set.
+- Material, prefab and collider assembly is still not in the package.
+
 ## [0.1.0] - 2026-09-21
 
 First release. Establishes the capability model and the generator pipeline.

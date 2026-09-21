@@ -91,7 +91,13 @@ namespace AlperenElbiz.DccBridge.Editor
                 return state.Detected ? "off (installed)" : "off";
             }
 
-            return state.Detected ? "ready" : "missing";
+            if (!state.Detected)
+            {
+                return "missing";
+            }
+
+            // Installed but not listening is a distinct, recoverable state worth naming.
+            return state.NeedsConnection && !state.Connected ? "not connected" : "ready";
         }
 
         private static GUIStyle StatusStyle(DccToolState state)
@@ -99,7 +105,7 @@ namespace AlperenElbiz.DccBridge.Editor
             var style = new GUIStyle(EditorStyles.miniLabel);
             style.normal.textColor = !state.Enabled
                 ? Color.gray
-                : state.Detected
+                : state.Ready
                     ? new Color(0.35f, 0.72f, 0.42f)
                     : new Color(0.85f, 0.55f, 0.25f);
             return style;
