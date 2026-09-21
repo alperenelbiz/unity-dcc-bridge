@@ -113,13 +113,13 @@ namespace AlperenElbiz.DccBridge.Editor
                     for (var i = 0; i < count; i++)
                     {
                         var wanted = slots != null && i < slots.Length ? slots[i] : null;
-                        assigned[i] = wanted != null && materials.TryGetValue(wanted, out var m) ? m : fallback;
+                        assigned[i] = Resolve(wanted, materials) ?? fallback;
 
-                        if (wanted != null && !materials.ContainsKey(wanted))
+                        if (wanted != null && assigned[i] == fallback)
                         {
                             Debug.LogWarning(
                                 $"[DCC Bridge] {prop.name} slot {i} wants '{wanted}', which does not exist. " +
-                                "Declare it in data/materials.json.");
+                                "Declare it in data/materials.json, or paint that set in Substance.");
                         }
                     }
 
@@ -140,6 +140,26 @@ namespace AlperenElbiz.DccBridge.Editor
             {
                 UnityEngine.Object.DestroyImmediate(instance);
             }
+        }
+
+        /// <summary>
+        /// Finds a material by slot name, preferring one this run built but falling back to
+        /// whatever is already on disk.
+        ///
+        /// A material can legitimately come from somewhere this builder does not know about —
+        /// painted in Substance, or authored by hand. Only recognising generated ones silently
+        /// dropped those slots back to the atlas material.
+        /// </summary>
+        private static Material Resolve(string name, IReadOnlyDictionary<string, Material> generated)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return null;
+            }
+
+            return generated.TryGetValue(name, out var material)
+                ? material
+                : AssetDatabase.LoadAssetAtPath<Material>($"{MaterialBuilder.MaterialDir}/{name}.mat");
         }
 
         private static void AddCollider(GameObject instance, string kind)

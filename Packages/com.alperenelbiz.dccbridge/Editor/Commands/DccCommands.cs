@@ -149,6 +149,12 @@ namespace AlperenElbiz.DccBridge.Editor
         [MenuItem("Tools/DCC Bridge/Substance/Pack for URP", priority = 72)]
         public static string SubstancePackUrp() => Log(SubstanceUrpPacker.Pack(ToolRunner.ProjectRoot));
 
+        [CliCommand("dcc_sp_materials",
+            "Build a URP material per Substance texture set from the exported and packed maps.",
+            Tags = new[] { "dcc", "dcc/substance" })]
+        [MenuItem("Tools/DCC Bridge/Substance/Build Materials", priority = 73)]
+        public static string SubstanceMaterials() => Log(SubstanceMaterialBuilder.Build(ToolRunner.ProjectRoot));
+
         [MenuItem("Tools/DCC Bridge/Substance/Status", true)]
         [MenuItem("Tools/DCC Bridge/Substance/Export Textures", true)]
         private static bool SubstanceMenuEnabled() => DccBridgeSettings.Instance.IsUsable(DccTool.SubstancePainter);

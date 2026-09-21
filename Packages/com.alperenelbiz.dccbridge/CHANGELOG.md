@@ -5,6 +5,40 @@ All notable changes to this package are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2026-09-22
+
+Closes the hero-prop path: a prop painted in Substance now reaches a prefab in Unity.
+
+### Added
+
+- `dcc_sp_materials` — builds a URP material per Substance texture set from the exported
+  and packed maps: base colour, normal with `_NORMALMAP`, and the mask map in **both** the
+  Metallic and Occlusion slots as URP expects.
+
+  Materials are named after the texture set, which Substance took from the mesh's own
+  material names, so a slot called `M_PropLeather` finds a material called `M_PropLeather`
+  with no extra mapping. The corollary: a material comes either from the palette or from
+  Substance, never both — remove its entry from `data/materials.json` once a set is painted.
+
+### Fixed
+
+- **Prefab slots silently fell back to the atlas material** for anything this package did not
+  itself generate. A material painted in Substance, or authored by hand, exists on disk but
+  was invisible to the prefab builder. It now resolves by name from disk when a generated one
+  is not found.
+- **The atlas material kept leftovers.** Exporting an *unpainted* Substance texture set
+  produces maps that claim the same material name, leaving a normal and mask map attached to
+  a material meant to be flat colour — lighting the whole set wrong with nothing to show for
+  it. The atlas material now clears those slots and their keywords when it is rebuilt.
+
+### Verified end to end
+
+A chair modelled in Blender, exported, opened in Substance, painted with a smart material,
+then exported, packed and wired: the prefab carries `M_PropAtlas` and `M_PropLeather` in the
+right slots, the leather material binds base colour, normal (3160 distinct values from the
+paint) and mask map, and keywords `_NORMALMAP`, `_METALLICSPECGLOSSMAP`, `_OCCLUSIONMAP` are
+all set.
+
 ## [0.6.0] - 2026-09-22
 
 The Substance export path, exercised against a real project — which immediately showed the

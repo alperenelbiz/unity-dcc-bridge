@@ -56,6 +56,17 @@ namespace AlperenElbiz.DccBridge.Editor
 
             material.SetTexture("_BaseMap", atlas);
             material.SetColor("_BaseColor", Color.white);
+
+            // The atlas material is flat colour only. Clear any normal or mask map another step
+            // may have attached to this name — a Substance export of an unpainted texture set
+            // will happily claim it, and the leftovers then light the whole set wrong.
+            material.SetTexture("_BumpMap", null);
+            material.DisableKeyword("_NORMALMAP");
+            material.SetTexture("_MetallicGlossMap", null);
+            material.SetTexture("_OcclusionMap", null);
+            material.DisableKeyword("_METALLICSPECGLOSSMAP");
+            material.DisableKeyword("_OCCLUSIONMAP");
+
             material.SetFloat("_Metallic", 0f);
 
             // Just enough smoothness to catch a highlight, so flat props do not read as cardboard.
