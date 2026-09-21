@@ -1,0 +1,36 @@
+# Changelog
+
+All notable changes to this package are documented here.
+
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.1.0] - 2026-09-21
+
+First release. Establishes the capability model and the generator pipeline.
+
+### Added
+
+- **Tool capability system.** Blender, Photoshop and Python are each optional. A setup
+  window opens on first run, tools are auto-detected per platform, and every feature that
+  needs a missing tool is hidden from the menu and reports clearly when invoked.
+  Which tools a project expects is committed; where they are installed is not.
+- **Palette atlas generation** from `data/palette.json`, producing both the texture and the
+  UV lookup Blender snaps islands onto, so the image and the coordinates cannot drift apart.
+- **Seamless detail normal maps** from periodic Voronoi measured on a torus, tiling by
+  construction rather than by hand-fixing seams. Output is OpenGL +Y, matching Unity.
+- **Blender prop authoring and export.** Props are described as code with `propkit`, or fall
+  back to a sized blockout. Export validates applied scale, UV bounds per material, declared
+  materials and triangle budget, and refuses to write an FBX that would arrive broken.
+- **Incremental export** fingerprinted on source bytes plus settings, so unchanged props are
+  skipped and FBX timestamps stop dirtying the working tree on every run.
+- **CLI commands** registered through `com.unity.pipeline`, so an agent or CI job can drive a
+  *running* Editor: `dcc_status`, `dcc_palette`, `dcc_detail`, `dcc_validate`,
+  `dcc_build_props`, `dcc_export_props`, `dcc_run_all`.
+
+### Known limitations
+
+- Material, prefab and collider assembly is not in this release; it is the focus of 0.2.0.
+- Photoshop is detected and selectable but no command drives it yet.
+- `com.unity.pipeline` is an experimental Unity package. Its API may change between Unity
+  versions, which would require a matching release here.

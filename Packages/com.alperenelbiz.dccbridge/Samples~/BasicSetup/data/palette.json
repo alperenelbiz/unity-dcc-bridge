@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "atlas": { "size": 512, "columns": 8, "rows": 8 },
+  "notes": [
+    "Every prop UVs onto one of these cells, so a whole project shares one texture.",
+    "Order defines position: adding in the middle moves everything after it.",
+    "Values sit slightly bright because lit shaders multiply them by scene lighting."
+  ],
+  "swatches": [
+    { "name": "wood_dark",     "color": "#5A3A28" },
+    { "name": "wood_mid",      "color": "#8A5A3B" },
+    { "name": "wood_light",    "color": "#B08256" },
+    { "name": "metal_dark",    "color": "#3E4148" },
+    { "name": "metal_mid",     "color": "#7C8189" },
+    { "name": "chrome",        "color": "#B9C0C7" },
+    { "name": "wall",          "color": "#C6C0B4" },
+    { "name": "floor",         "color": "#6B6560" },
+    { "name": "plastic_black", "color": "#26262A" },
+    { "name": "plastic_white", "color": "#DFE0DE" },
+    { "name": "glass",         "color": "#A8C4C8" },
+    { "name": "accent",        "color": "#1F7A6B" }
+  ]
+}

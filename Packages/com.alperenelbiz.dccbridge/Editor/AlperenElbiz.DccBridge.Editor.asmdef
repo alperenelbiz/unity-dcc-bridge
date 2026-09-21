@@ -1,0 +1,15 @@
+{
+  "name": "AlperenElbiz.DccBridge.Editor",
+  "rootNamespace": "AlperenElbiz.DccBridge.Editor",
+  "references": [
+    "Unity.Pipeline"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "autoReferenced": true,
+  "noEngineReferences": false
+}

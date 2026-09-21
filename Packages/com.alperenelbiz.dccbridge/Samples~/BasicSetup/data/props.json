@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "blend_root": "art-source/blender",
+  "defaults": {
+    "material": "M_PropAtlas",
+    "collection": "Export",
+    "swatch": "wood_mid",
+    "collider": "box",
+    "tri_budget": 1500
+  },
+  "props": [
+    {
+      "name": "crate",
+      "blend": "props/crate.blend",
+      "size": [0.6, 0.6, 0.45],
+      "swatch": "wood_mid",
+      "collider": "box",
+      "tri_budget": 300,
+      "category": "props"
+    },
+    {
+      "name": "stool",
+      "blend": "props/stool.blend",
+      "builder": "scripts/stool.py",
+      "size": [0.34, 0.34, 0.62],
+      "swatch": "wood_light",
+      "collider": "box",
+      "tri_budget": 400,
+      "category": "furniture"
+    }
+  ]
+}

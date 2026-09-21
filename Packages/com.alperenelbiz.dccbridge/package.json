@@ -1,0 +1,30 @@
+{
+  "name": "com.alperenelbiz.dccbridge",
+  "version": "0.1.0",
+  "displayName": "DCC Bridge",
+  "description": "Drives Blender and Photoshop from Unity to build game-ready assets: headless export with validation, palette atlases, seamless detail maps, and automatic material, prefab and collider assembly. Each tool is optional — the pipeline adapts to whichever ones you have.",
+  "unity": "6000.0",
+  "author": {
+    "name": "Alperen Elbiz",
+    "url": "https://github.com/alperenelbiz"
+  },
+  "license": "MIT",
+  "keywords": [
+    "pipeline",
+    "blender",
+    "photoshop",
+    "asset-pipeline",
+    "automation",
+    "dcc"
+  ],
+  "dependencies": {
+    "com.unity.pipeline": "0.7.0-exp.1"
+  },
+  "samples": [
+    {
+      "displayName": "Basic Setup",
+      "description": "A starter palette, prop manifest and Blender builder script to copy into your project.",
+      "path": "Samples~/BasicSetup"
+    }
+  ]
+}

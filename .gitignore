@@ -1,0 +1,26 @@
+# Unity test project artifacts
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+
+# Never ignore meta files
+!*.meta
+
+# IDE
+.vscode/
+.idea/
+*.csproj
+*.sln
+*.slnx
+
+# OS
+.DS_Store
+._*
+
+# Python tooling
+**/__pycache__/
+**/.venv/
+*.pyc
