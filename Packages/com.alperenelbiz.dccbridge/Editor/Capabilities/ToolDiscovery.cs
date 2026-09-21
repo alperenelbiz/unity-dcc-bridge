@@ -160,13 +160,52 @@ namespace AlperenElbiz.DccBridge.Editor
                 case DccTool.Photoshop:
                 case DccTool.SubstancePainter:
                     // An .app bundle cannot be run for --version, and launching a GUI application
-                    // just to read one would be worse; the install folder carries the year.
-                    var name = Path.GetFileName(path.TrimEnd('/', '\\'));
-                    return string.IsNullOrEmpty(name) ? "installed" : name;
+                    // just to read one would be worse. The version lives in the *containing*
+                    // folder, not the bundle: Steam's bundle is always "Adobe Substance 3D
+                    // Painter.app" while its folder says "Substance 3D Painter 2023".
+                    return DescribeInstall(path);
 
                 default:
                     return string.Empty;
             }
+        }
+
+        /// <summary>Best available version label for a GUI application, without launching it.</summary>
+        private static string DescribeInstall(string path)
+        {
+            var trimmed = path.TrimEnd('/', '\\');
+            var bundle = Path.GetFileName(trimmed);
+
+            // Prefer the containing folder when it carries a version the bundle name does not.
+            var parent = Path.GetFileName(Path.GetDirectoryName(trimmed) ?? string.Empty);
+            if (!string.IsNullOrEmpty(parent) && HasVersion(parent))
+            {
+                return parent;
+            }
+
+            if (bundle.EndsWith(".app", StringComparison.OrdinalIgnoreCase))
+            {
+                bundle = bundle[..^4];
+            }
+            else if (bundle.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
+            {
+                bundle = Path.GetFileName(Path.GetDirectoryName(trimmed) ?? string.Empty);
+            }
+
+            return string.IsNullOrEmpty(bundle) ? "installed" : bundle;
+        }
+
+        private static bool HasVersion(string name)
+        {
+            foreach (var part in name.Split(' '))
+            {
+                if (part.Length == 4 && int.TryParse(part, out var year) && year is >= 2000 and <= 2100)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static string FirstLine(string executable, string arguments)

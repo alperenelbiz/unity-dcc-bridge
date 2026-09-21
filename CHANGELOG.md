@@ -5,6 +5,36 @@ All notable changes to this package are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2026-09-22
+
+First release actually installed into a separate project. Two bugs only a live install
+could surface.
+
+### Fixed
+
+- **The package shipped no `.meta` files, so nothing in it loaded at all.** A UPM package
+  is immutable: Unity cannot write meta files into the package cache, so any asset without
+  one is never imported. The assembly definition was invisible, the assembly was never
+  built, and not one command registered — while `package_resolve` and the compiler both
+  reported success. Meta files are now committed, as every published Unity package does.
+- Version labels for GUI applications showed the bundle instead of the install. Substance
+  read as `Adobe Substance 3D Painter.app` when the version is in the folder name —
+  `Substance 3D Painter 2023`. Photoshop kept a stray `.app`.
+
+### Verified in LGS-Simulator
+
+Installed by git URL, then exercised against a running Editor: all nine commands register;
+the palette atlas is **byte-identical** to the Python implementation it replaced (0 of
+262,144 pixels differ, UV lookup identical); detail maps, validation, materials, prefabs
+and colliders all produce correct output; and `dcc_run_all` skips the Blender steps when
+Blender is disabled instead of failing.
+
+### Known limitations
+
+- Detail map generation takes ~16s for a 512 tile. The Voronoi pass is brute force and has
+  not been optimised.
+- Photoshop and Substance are detected and selectable, but no command drives them yet.
+
 ## [0.3.0] - 2026-09-22
 
 Removes the external Python requirement and completes the Unity-side assembly. A project
