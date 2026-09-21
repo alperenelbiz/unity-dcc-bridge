@@ -49,15 +49,6 @@ namespace AlperenElbiz.DccBridge.Editor
                     yield return Path.Combine(Home, @"scoop\apps\blender\current\blender.exe");
                     break;
 
-                case DccTool.Python:
-                    yield return Path.Combine(Home, ".local/bin/uv");
-                    yield return "/opt/homebrew/bin/uv";
-                    yield return "/usr/local/bin/uv";
-                    yield return Path.Combine(Home, ".cargo/bin/uv");
-                    yield return Path.Combine(Home, @"AppData\Local\Programs\uv\uv.exe");
-                    yield return Path.Combine(Home, @".local\bin\uv.exe");
-                    break;
-
                 case DccTool.Photoshop:
                     foreach (var year in AdobeYears)
                     {
@@ -164,7 +155,6 @@ namespace AlperenElbiz.DccBridge.Editor
             switch (tool)
             {
                 case DccTool.Blender:
-                case DccTool.Python:
                     return FirstLine(path, "--version");
 
                 case DccTool.Photoshop:

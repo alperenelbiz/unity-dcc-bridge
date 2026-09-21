@@ -5,6 +5,39 @@ All notable changes to this package are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-09-22
+
+Removes the external Python requirement and completes the Unity-side assembly. A project
+with **no DCC tools installed at all** now has a working pipeline.
+
+### Changed — breaking
+
+- **Python (uv) is no longer a tool.** Its only real job was writing PNGs; numpy already
+  ships inside Blender and the rest was plain Python. The generators are C# now, so nothing
+  outside Unity has to be installed to use them. Projects that enabled Python in
+  `ProjectSettings/DccBridge.json` will simply stop listing it — no migration needed, and
+  the enum values of the remaining tools are unchanged.
+- `Tools~/pipeline` is gone. The Python that remains runs inside Blender's own interpreter,
+  where `bpy` leaves no alternative.
+
+### Added
+
+- **Material assembly.** The atlas material is built from the palette. Detail materials —
+  the ones carrying a real tiling texture rather than a flat swatch — are declared per
+  project in the optional `data/materials.json`, so no material name is baked into the package.
+- **Prefab assembly.** One placeable prefab per prop: mesh, materials in the slot order the
+  exporter recorded, and a collider sized from mesh bounds. An FBX cannot carry a collider,
+  so anything downstream should reference the prefab.
+- **Import rules** applied by path convention: point-filtered unmipped palette atlas,
+  repeating linear detail maps, and models that keep the scale and axes the exporter baked.
+- Commands `dcc_materials` and `dcc_prefabs`, and both added to `dcc_run_all`.
+
+### Known limitations
+
+- Photoshop and Substance are detected and selectable, but no command drives them yet.
+- The package has not yet been installed into a separate project end to end; every claim
+  above is from compilation and code review, not from a live run.
+
 ## [0.2.0] - 2026-09-21
 
 Adds Substance 3D Painter as a selectable tool, and teaches the capability system the

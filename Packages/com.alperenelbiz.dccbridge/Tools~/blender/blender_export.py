@@ -65,6 +65,8 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     args = argv[argv.index("--") + 1 :] if "--" in argv else []
     p = argparse.ArgumentParser(prog="blender_export")
     p.add_argument("--job", required=True, help="props.json manifest")
+    p.add_argument("--project-root", dest="project_root", default=None,
+                   help="the Unity project root; passed by Unity rather than inferred")
     p.add_argument("--out", required=True, help="output dir for FBX (inside Assets/)")
     p.add_argument("--receipt", default=None, help="where to write the JSON receipt")
     p.add_argument("--only", default=None, help="export just this prop name")
@@ -256,7 +258,7 @@ def main() -> int:
 
     job_path = Path(args.job).resolve()
     job = json.loads(job_path.read_text())
-    project_root = job_path.parent.parent
+    project_root = Path(args.project_root).resolve() if args.project_root else job_path.parent.parent
     blend_root = (project_root / job.get("blend_root", "art-source/blender")).resolve()
     out_dir = Path(args.out).resolve()
 

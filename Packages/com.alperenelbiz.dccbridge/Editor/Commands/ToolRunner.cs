@@ -23,16 +23,19 @@ namespace AlperenElbiz.DccBridge.Editor
             Error = error;
         }
 
-        public override string ToString() =>
-            Ok ? Output : $"{Output}\n{Error}".Trim();
+        public override string ToString() => Ok ? Output : $"{Output}\n{Error}".Trim();
     }
 
     /// <summary>
-    /// Runs the package's Python tooling against the consuming project.
+    /// Runs Blender headlessly against the consuming project.
     ///
-    /// The scripts live under Tools~ inside the package. The trailing tilde keeps Unity from
-    /// importing them at all, which is what allows a Python toolchain to ship inside a UPM
-    /// package without generating meta files or import errors.
+    /// Blender is the only tool invoked as a process. Everything that used to need an external
+    /// Python runtime — palette atlases, detail maps, validation — is C# now, so a project with
+    /// no DCC tools installed still has a working pipeline. The Python that remains runs inside
+    /// Blender's own interpreter, where `bpy` leaves no alternative.
+    ///
+    /// The scripts live under Tools~ in the package; the trailing tilde keeps Unity from
+    /// importing them, which is what lets a Python toolchain ship inside a UPM package.
     /// </summary>
     public static class ToolRunner
     {
@@ -52,61 +55,10 @@ namespace AlperenElbiz.DccBridge.Editor
                     return info.resolvedPath;
                 }
 
-                // Embedded in Packages/ during development of the package itself.
+                // Embedded in Packages/ while developing the package itself.
                 var fallback = Path.Combine(ProjectRoot, "Packages", "com.alperenelbiz.dccbridge");
                 return Directory.Exists(fallback) ? fallback : null;
             }
-        }
-
-        private static string PipelineDir
-        {
-            get
-            {
-                var root = PackageRoot;
-                return root == null ? null : Path.Combine(root, "Tools~", "pipeline");
-            }
-        }
-
-        /// <summary>
-        /// Runs a generator. Reports a missing tool as a clear message instead of failing
-        /// somewhere inside the toolchain, which is the whole point of the capability system.
-        /// </summary>
-        public static ToolResult RunPipeline(string command, params string[] extra)
-        {
-            var settings = DccBridgeSettings.Instance;
-
-            var uv = settings.PathFor(DccTool.Python);
-            if (uv == null)
-            {
-                return Unavailable(DccTool.Python);
-            }
-
-            var pipelineDir = PipelineDir;
-            if (pipelineDir == null || !Directory.Exists(pipelineDir))
-            {
-                return new ToolResult(false, string.Empty,
-                    "DCC Bridge: the package's Tools~ folder could not be located.");
-            }
-
-            var arguments = new StringBuilder();
-            arguments.Append($"run --project \"{pipelineDir}\" python \"{Path.Combine(pipelineDir, "cli.py")}\" ");
-            arguments.Append($"--project-root \"{ProjectRoot}\" ");
-
-            // Blender's path is resolved here, where the user's configuration is known, rather
-            // than re-discovered inside Python with a different set of guesses.
-            var blender = settings.PathFor(DccTool.Blender);
-            if (blender != null)
-            {
-                arguments.Append($"--blender \"{blender}\" ");
-            }
-
-            arguments.Append(command);
-            foreach (var token in extra)
-            {
-                arguments.Append(' ').Append(token);
-            }
-
-            return Execute(uv, arguments.ToString());
         }
 
         /// <summary>Guards a command that cannot work without a particular tool.</summary>
@@ -120,6 +72,47 @@ namespace AlperenElbiz.DccBridge.Editor
 
             failure = Unavailable(tool);
             return false;
+        }
+
+        /// <summary>
+        /// Runs one of the package's Blender scripts with the project's props manifest.
+        /// </summary>
+        public static ToolResult RunBlender(string scriptName, params string[] extra)
+        {
+            if (!Require(DccTool.Blender, out var failure))
+            {
+                return failure;
+            }
+
+            var packageRoot = PackageRoot;
+            if (packageRoot == null)
+            {
+                return new ToolResult(false, string.Empty,
+                    "DCC Bridge: the package's Tools~ folder could not be located.");
+            }
+
+            var script = Path.Combine(packageRoot, "Tools~", "blender", scriptName);
+            if (!File.Exists(script))
+            {
+                return new ToolResult(false, string.Empty, $"script not found: {script}");
+            }
+
+            var blender = DccBridgeSettings.Instance.PathFor(DccTool.Blender);
+            var manifest = Path.Combine(ProjectRoot, "data", "props.json");
+
+            var arguments = new StringBuilder();
+            // --factory-startup makes a run reproducible by ignoring personal prefs and add-ons.
+            arguments.Append("--background --factory-startup ");
+            arguments.Append($"--python \"{script}\" -- ");
+            arguments.Append($"--job \"{manifest}\" ");
+            arguments.Append($"--project-root \"{ProjectRoot}\"");
+
+            foreach (var token in extra)
+            {
+                arguments.Append(' ').Append(token);
+            }
+
+            return Execute(blender, arguments.ToString());
         }
 
         private static ToolResult Unavailable(DccTool tool)
@@ -163,22 +156,39 @@ namespace AlperenElbiz.DccBridge.Editor
                 if (!process.WaitForExit(DefaultTimeoutMs))
                 {
                     process.Kill();
-                    return new ToolResult(false, stdout, "timed out");
+                    return new ToolResult(false, Filter(stdout), "timed out");
                 }
 
                 if (process.ExitCode != 0)
                 {
-                    return new ToolResult(false, stdout, stderr.Trim());
+                    return new ToolResult(false, Filter(stdout), stderr.Trim());
                 }
 
                 AssetDatabase.Refresh();
-                return new ToolResult(true, stdout.Trim(), string.Empty);
+                return new ToolResult(true, Filter(stdout), string.Empty);
             }
             catch (Exception e)
             {
                 Debug.LogError($"[DCC Bridge] {executable} threw: {e.Message}");
                 return new ToolResult(false, string.Empty, e.Message);
             }
+        }
+
+        /// <summary>Blender is noisy on stdout; only the scripts' own tagged lines are useful.</summary>
+        private static string Filter(string stdout)
+        {
+            var kept = new StringBuilder();
+            foreach (var line in stdout.Split('\n'))
+            {
+                var trimmed = line.TrimEnd();
+                if (trimmed.StartsWith("[export]") || trimmed.StartsWith("[build]") ||
+                    trimmed.TrimStart().StartsWith("warn:") || trimmed.TrimStart().StartsWith("error:"))
+                {
+                    kept.AppendLine(trimmed);
+                }
+            }
+
+            return kept.ToString().TrimEnd();
         }
     }
 }

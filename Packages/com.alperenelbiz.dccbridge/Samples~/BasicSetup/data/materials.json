@@ -1,0 +1,11 @@
+{
+  "materials": [
+    {
+      "name": "M_PropLeather",
+      "baseSwatch": "plastic_black",
+      "normalMap": "T_LeatherNormal",
+      "smoothness": 0.34,
+      "metallic": 0.0
+    }
+  ]
+}

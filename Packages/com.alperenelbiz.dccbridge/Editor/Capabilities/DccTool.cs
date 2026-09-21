@@ -3,24 +3,23 @@ using System;
 namespace AlperenElbiz.DccBridge.Editor
 {
     /// <summary>An external authoring tool the pipeline can drive. Unity itself is always present.</summary>
+    /// <summary>
+    /// Values are explicit and never reused. JsonUtility serialises an enum by its integer, so
+    /// renumbering would silently reassign every already-saved project's settings — including 2,
+    /// which was Python before its generators moved into C# in 0.3.0.
+    /// </summary>
     public enum DccTool
     {
-        /// <summary>Headless Blender: modelling, export, validation.</summary>
-        Blender,
+        /// <summary>Headless Blender: prop authoring, export and validation.</summary>
+        Blender = 0,
 
         /// <summary>Photoshop through a local plugin proxy: template authoring and layer export.</summary>
-        Photoshop,
+        Photoshop = 1,
 
-        /// <summary>A Python 3 runtime via uv, used by every generator that runs outside Unity.</summary>
-        Python,
+        // 2 was Python (uv). Removed in 0.3.0 — the generators it ran are now C#.
 
-        /// <summary>
-        /// Substance 3D Painter, driven through its remote scripting port.
-        ///
-        /// Appended rather than inserted: JsonUtility serialises an enum by its integer value,
-        /// so reordering these would silently reassign every already-saved project's settings.
-        /// </summary>
-        SubstancePainter
+        /// <summary>Substance 3D Painter, driven through its remote scripting port.</summary>
+        SubstancePainter = 3
     }
 
     /// <summary>
@@ -79,7 +78,6 @@ namespace AlperenElbiz.DccBridge.Editor
         {
             DccTool.Blender => "Blender",
             DccTool.Photoshop => "Photoshop",
-            DccTool.Python => "Python (uv)",
             DccTool.SubstancePainter => "Substance 3D Painter",
             _ => Tool.ToString()
         };
@@ -88,7 +86,6 @@ namespace AlperenElbiz.DccBridge.Editor
         {
             DccTool.Blender => "Builds and exports 3D props, validates them before they reach Unity",
             DccTool.Photoshop => "Authors texture templates and exports their layers",
-            DccTool.Python => "Runs the generators: palette atlases, detail maps, validation",
             DccTool.SubstancePainter => "Paints and exports PBR texture sets for hero props",
             _ => string.Empty
         };

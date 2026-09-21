@@ -1,8 +1,8 @@
 # DCC Bridge
 
-Drives Blender, Photoshop and Substance 3D Painter from Unity to build game-ready assets —
-headless export with validation, palette atlases, seamless detail maps, and material
-assembly.
+Builds game-ready assets in Unity — palette atlases, seamless detail maps, validation, and
+material, prefab and collider assembly — and drives Blender, Photoshop and Substance 3D
+Painter when you have them.
 
 **Every tool is optional.** Not everyone on a team can run Blender or owns Photoshop, so
 the pipeline adapts: you pick what you have, and only those features appear.
@@ -11,12 +11,15 @@ the pipeline adapts: you pick what you have, and only those features appear.
 
 - Unity 6000.0 or newer
 - `com.unity.pipeline` (installed automatically as a dependency)
-- Optional: Blender 4.2+, Photoshop, Substance 3D Painter, and
-  [uv](https://docs.astral.sh/uv/) for the Python tools
+- Optional: Blender 4.2+, Photoshop, Substance 3D Painter
+
+**Nothing outside Unity is required.** With no DCC tool installed you still get palette
+atlases, detail maps, validation, materials, prefabs and colliders. Each tool you add
+unlocks more.
 
 ### How the tools differ
 
-Blender runs **headless** — it is driven in batch with no window, so it can do bulk work.
+Blender runs **headless** — driven in batch with no window, so it can do bulk work.
 
 Photoshop and Substance do **not**. Both are driven over a local socket against a running
 application (ports 3001 and 60041), and both stay silent unless launched with remote
@@ -29,16 +32,16 @@ generators mass-produce from what they export.
 Package Manager → **Add package from git URL**:
 
 ```
-https://github.com/alperenelbiz/unity-dcc-bridge.git?path=/Packages/com.alperenelbiz.dccbridge#v0.2.0
+https://github.com/alperenelbiz/unity-dcc-bridge.git?path=/Packages/com.alperenelbiz.dccbridge#v0.3.0
 ```
 
-Pin the tag. Without `#v0.2.0` you track the default branch and every fetch may bring
+Pin the tag. Without `#v0.3.0` you track the default branch and every fetch may bring
 breaking changes.
 
 To upgrade, change the tag and let the Package Manager re-resolve:
 
 ```
-...#v0.3.0
+...#v0.4.0
 ```
 
 ## First run
@@ -74,12 +77,15 @@ with only Unity still gets everything that does not need Blender.
 data/
   palette.json        swatch definitions — the atlas is generated from this, not painted
   props.json          prop manifest: size, swatch, collider, triangle budget, builder
+  materials.json      optional: detail materials carrying a real tiling texture
 art-source/
   blender/props/      one .blend per prop
   blender/scripts/    optional prop builder scripts (geometry as reviewable source)
   blender/_lib/       generated UV lookup and palette reference
 Assets/Art/
   Models/             generated FBX          SM_PascalCase.fbx
+  Prefabs/            generated prefabs      P_PascalCase.prefab
+  Materials/          generated materials    M_PascalCase.mat
   Textures/Atlas/     palette atlas          point filtered, no mips
   Textures/Detail/    tiling detail maps     repeat, linear, mipped
 ```

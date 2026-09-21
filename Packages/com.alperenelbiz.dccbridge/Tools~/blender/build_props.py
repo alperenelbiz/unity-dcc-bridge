@@ -33,6 +33,9 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     args = argv[argv.index("--") + 1 :] if "--" in argv else []
     p = argparse.ArgumentParser(prog="build_props")
     p.add_argument("--job", required=True)
+    # Passed explicitly by Unity. Inferring it from the manifest's location breaks as soon
+    # as a project keeps its data folder somewhere other than alongside Assets/.
+    p.add_argument("--project-root", dest="project_root", default=None)
     p.add_argument("--only", default=None)
     p.add_argument("--force", action="store_true", help="rebuild props whose .blend exists")
     return p.parse_args(args)
@@ -74,7 +77,7 @@ def main() -> int:
     args = parse_args(sys.argv)
     job_path = Path(args.job).resolve()
     job = json.loads(job_path.read_text())
-    project_root = job_path.parent.parent
+    project_root = Path(args.project_root).resolve() if args.project_root else job_path.parent.parent
     blend_root = project_root / job.get("blend_root", "art-source/blender")
     defaults = job.get("defaults", {})
     lookup = palette_uv.load_lookup(project_root)
