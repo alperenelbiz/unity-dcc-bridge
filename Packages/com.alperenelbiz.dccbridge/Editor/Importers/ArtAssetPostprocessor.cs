@@ -16,6 +16,7 @@ namespace AlperenElbiz.DccBridge.Editor
         private const string TexturesRoot = "Assets/Art/Textures/";
         private const string AtlasRoot = "Assets/Art/Textures/Atlas/";
         private const string DetailRoot = "Assets/Art/Textures/Detail/";
+        private const string SubstanceRoot = "Assets/Art/Textures/Substance/";
 
         private void OnPreprocessModel()
         {
@@ -67,6 +68,10 @@ namespace AlperenElbiz.DccBridge.Editor
             {
                 ConfigureDetailMap(importer);
             }
+            else if (assetPath.StartsWith(SubstanceRoot, StringComparison.Ordinal))
+            {
+                ConfigureSubstanceMap(importer);
+            }
             else if (assetPath.StartsWith(TexturesRoot, StringComparison.Ordinal))
             {
                 ConfigureGeneralTexture(importer);
@@ -106,6 +111,29 @@ namespace AlperenElbiz.DccBridge.Editor
             importer.filterMode = FilterMode.Bilinear;
             importer.wrapMode = TextureWrapMode.Repeat;
             importer.maxTextureSize = 512;
+            importer.textureCompression = TextureImporterCompression.Compressed;
+            importer.anisoLevel = 4;
+        }
+
+        /// <summary>
+        /// Substance exports its own naming — `_BaseColor`, `_Normal`, `_Metallic`, `_Roughness`,
+        /// `_Height` — which the general `_N` convention does not recognise. Getting this wrong
+        /// is silent: an sRGB normal map or a colour-space-mangled roughness map lights subtly
+        /// wrong everywhere without any error.
+        /// </summary>
+        private static void ConfigureSubstanceMap(TextureImporter importer)
+        {
+            var name = Path.GetFileNameWithoutExtension(importer.assetPath);
+            var isNormal = name.EndsWith("_Normal", StringComparison.Ordinal);
+            var isColour = name.EndsWith("_BaseColor", StringComparison.Ordinal)
+                        || name.EndsWith("_Diffuse", StringComparison.Ordinal)
+                        || name.EndsWith("_Emissive", StringComparison.Ordinal);
+
+            importer.textureType = isNormal ? TextureImporterType.NormalMap : TextureImporterType.Default;
+            importer.sRGBTexture = isColour;
+            importer.mipmapEnabled = true;
+            importer.wrapMode = TextureWrapMode.Repeat;
+            importer.maxTextureSize = 2048;
             importer.textureCompression = TextureImporterCompression.Compressed;
             importer.anisoLevel = 4;
         }

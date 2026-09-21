@@ -143,6 +143,12 @@ namespace AlperenElbiz.DccBridge.Editor
             return Report(result);
         }
 
+        [CliCommand("dcc_sp_pack_urp",
+            "Repack a Substance export into URP's mask map layout (R metallic, G occlusion, A smoothness).",
+            Tags = new[] { "dcc", "dcc/substance" })]
+        [MenuItem("Tools/DCC Bridge/Substance/Pack for URP", priority = 72)]
+        public static string SubstancePackUrp() => Log(SubstanceUrpPacker.Pack(ToolRunner.ProjectRoot));
+
         [MenuItem("Tools/DCC Bridge/Substance/Status", true)]
         [MenuItem("Tools/DCC Bridge/Substance/Export Textures", true)]
         private static bool SubstanceMenuEnabled() => DccBridgeSettings.Instance.IsUsable(DccTool.SubstancePainter);

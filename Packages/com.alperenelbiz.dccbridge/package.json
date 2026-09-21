@@ -1,6 +1,6 @@
 {
   "name": "com.alperenelbiz.dccbridge",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "displayName": "DCC Bridge",
   "description": "Builds game-ready assets in Unity: palette atlases, seamless detail maps, validation, and material, prefab and collider assembly \u2014 all in-editor, with no external runtime. Optionally drives Blender, Photoshop and Substance 3D Painter when you have them.",
   "unity": "6000.0",

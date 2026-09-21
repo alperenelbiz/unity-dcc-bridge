@@ -5,6 +5,39 @@ All notable changes to this package are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2026-09-22
+
+The Substance export path, exercised against a real project — which immediately showed the
+export alone was not usable in URP.
+
+### Added
+
+- `dcc_sp_pack_urp` — repacks a Substance export into the layout URP's Lit shader reads:
+  R metallic, G occlusion, B unused, **A smoothness**, assigned to *both* the Metallic and
+  Occlusion slots with sRGB off.
+
+  Substance writes **roughness**; URP wants **smoothness**, its inverse. Handing a Substance
+  export straight to URP makes every rough surface glossy and every glossy one rough, and
+  nothing errors — which is why this is a pipeline step rather than a note in the docs.
+  Verified: source roughness 77 becomes smoothness 178.
+
+- **Import rules for Substance output.** Its `_BaseColor` / `_Normal` / `_Metallic` /
+  `_Roughness` / `_Height` naming is not the `_N` convention the general rule looks for, so
+  normal maps were importing as colour textures. Also silent, also wrong everywhere.
+
+### Verified
+
+Created a project remotely from an exported chair FBX; Substance picked up both material
+names from the mesh (`M_PropAtlas`, `M_PropLeather`) as its texture sets. Exported 10
+textures across both sets, then packed them into two URP mask maps with the channel maths
+confirmed.
+
+### Known limitations
+
+- The export preset is still fixed to `PBR Metallic Roughness`. Resource search for the
+  installed presets returns empty through the remote API, so the preset cannot yet be
+  discovered or chosen — repacking afterwards is the reliable route.
+
 ## [0.5.0] - 2026-09-22
 
 Substance 3D Painter is now driven. All three tools are wired.
