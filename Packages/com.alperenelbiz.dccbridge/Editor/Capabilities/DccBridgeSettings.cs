@@ -23,7 +23,6 @@ namespace AlperenElbiz.DccBridge.Editor
     {
         private const string SettingsFile = "ProjectSettings/DccBridge.json";
         private const string PathPrefKey = "AlperenElbiz.DccBridge.ToolPath.";
-        private const string ConfiguredPrefKey = "AlperenElbiz.DccBridge.Configured";
 
         [SerializeField] private List<DccToolState> tools = new();
 
@@ -109,7 +108,10 @@ namespace AlperenElbiz.DccBridge.Editor
                 state.Path = EditorPrefs.GetString(PathPrefKey + tool, string.Empty);
             }
 
-            loaded.configured = loaded.configured && EditorPrefs.GetBool(ConfiguredPrefKey, false);
+            // `configured` is a project fact, not a per-machine one: once someone has chosen
+            // which tools the project uses, a teammate cloning it should not be asked again.
+            // Their own install paths are still discovered locally, and a tool that is enabled
+            // but missing shows up as such in Project Settings.
             loaded.ProbeAll();
             return loaded;
         }
@@ -134,7 +136,6 @@ namespace AlperenElbiz.DccBridge.Editor
                 state.Path = saved[state.Tool];
             }
 
-            EditorPrefs.SetBool(ConfiguredPrefKey, configured);
         }
 
         internal static void Reload() => instance = null;
