@@ -57,13 +57,19 @@ namespace AlperenElbiz.DccBridge.Editor
         /// <summary>Why the tool is unusable, when it is.</summary>
         [NonSerialized] public string Problem = string.Empty;
 
-        /// <summary>Tools that are driven over a local port rather than by launching a binary.</summary>
-        public bool NeedsConnection => Tool is DccTool.Photoshop or DccTool.SubstancePainter;
+        /// <summary>
+        /// Driven over a local port. Only Substance: its remote scripting server is part of the
+        /// application. Photoshop has no such server — it is scripted through the OS, so a port
+        /// check there would be testing some third-party bridge rather than Photoshop itself.
+        /// </summary>
+        public bool NeedsConnection => Tool is DccTool.SubstancePainter;
+
+        /// <summary>Driven by scripting a live application, so it has to be open.</summary>
+        public bool NeedsRunning => Tool is DccTool.Photoshop;
 
         /// <summary>The port its remote-control channel listens on, or 0.</summary>
         public int Port => Tool switch
         {
-            DccTool.Photoshop => 3001,          // adb-mcp plugin proxy
             DccTool.SubstancePainter => 60041,  // --enable-remote-scripting
             _ => 0
         };
@@ -71,8 +77,8 @@ namespace AlperenElbiz.DccBridge.Editor
         /// <summary>Enabled, present, and with no reported problem.</summary>
         public bool Usable => Enabled && Detected && string.IsNullOrEmpty(Problem);
 
-        /// <summary>Usable and, for a port-driven tool, actually reachable right now.</summary>
-        public bool Ready => Usable && (!NeedsConnection || Connected);
+        /// <summary>Usable and, where the tool must be live, actually reachable right now.</summary>
+        public bool Ready => Usable && (!(NeedsConnection || NeedsRunning) || Connected);
 
         public string DisplayName => Tool switch
         {

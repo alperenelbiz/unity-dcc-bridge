@@ -98,6 +98,26 @@ namespace AlperenElbiz.DccBridge.Editor
         [MenuItem("Tools/DCC Bridge/Assemble/Prefabs", priority = 45)]
         public static string Prefabs() => Log(PrefabBuilder.Rebuild(ToolRunner.ProjectRoot));
 
+        [CliCommand("dcc_ps_describe", "Report the document currently open in Photoshop.",
+            Tags = new[] { "dcc", "dcc/photoshop" })]
+        [MenuItem("Tools/DCC Bridge/Photoshop/Describe Open Document", priority = 60)]
+        public static string PhotoshopDescribe() => Report(PhotoshopBridge.Describe());
+
+        [CliCommand("dcc_ps_export_layers",
+            "Export each top-level layer of the open Photoshop document as a PNG into art-source/photoshop/export.",
+            Tags = new[] { "dcc", "dcc/photoshop" })]
+        [MenuItem("Tools/DCC Bridge/Photoshop/Export Layers", priority = 61)]
+        public static string PhotoshopExportLayers()
+        {
+            var target = System.IO.Path.Combine(
+                ToolRunner.ProjectRoot, "art-source", "photoshop", "export");
+            return Report(PhotoshopBridge.ExportLayers(target));
+        }
+
+        [MenuItem("Tools/DCC Bridge/Photoshop/Describe Open Document", true)]
+        [MenuItem("Tools/DCC Bridge/Photoshop/Export Layers", true)]
+        private static bool PhotoshopMenuEnabled() => DccBridgeSettings.Instance.IsUsable(DccTool.Photoshop);
+
         [CliCommand("dcc_run_all", "Run every step available with the tools this project has enabled.",
             Tags = new[] { "dcc" })]
         [MenuItem("Tools/DCC Bridge/Run Everything", priority = 50)]

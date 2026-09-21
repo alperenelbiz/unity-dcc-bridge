@@ -96,8 +96,10 @@ namespace AlperenElbiz.DccBridge.Editor
                 return "missing";
             }
 
-            // Installed but not listening is a distinct, recoverable state worth naming.
-            return state.NeedsConnection && !state.Connected ? "not connected" : "ready";
+            // Installed but not live is a distinct, recoverable state worth naming.
+            if (state.NeedsConnection && !state.Connected) return "not connected";
+            if (state.NeedsRunning && !state.Connected) return "not running";
+            return "ready";
         }
 
         private static GUIStyle StatusStyle(DccToolState state)

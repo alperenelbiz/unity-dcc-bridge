@@ -101,15 +101,21 @@ namespace AlperenElbiz.DccBridge.Editor
             state.Detected = true;
             state.Version = ReadVersion(state.Tool, path);
 
-            if (!state.NeedsConnection)
+            if (state.NeedsConnection)
             {
-                return;
+                state.Connected = IsListening(state.Port);
+                if (!state.Connected)
+                {
+                    state.Problem = ConnectionHint(state.Tool, state.Port);
+                }
             }
-
-            state.Connected = IsListening(state.Port);
-            if (!state.Connected)
+            else if (state.NeedsRunning)
             {
-                state.Problem = ConnectionHint(state.Tool, state.Port);
+                state.Connected = IsRunning(state.Tool);
+                if (!state.Connected)
+                {
+                    state.Problem = $"Installed, but not running. {state.DisplayName} is scripted live, so open it first.";
+                }
             }
         }
 
@@ -145,10 +151,43 @@ namespace AlperenElbiz.DccBridge.Editor
         {
             DccTool.SubstancePainter =>
                 $"Installed, but nothing is listening on {port}. Launch Substance with --enable-remote-scripting.",
-            DccTool.Photoshop =>
-                $"Installed, but nothing is listening on {port}. Start the plugin proxy and check the Photoshop plugin is connected.",
             _ => $"Nothing is listening on {port}."
         };
+
+        /// <summary>Whether a GUI application is currently open, by process name.</summary>
+        private static bool IsRunning(DccTool tool)
+        {
+            var needle = tool switch
+            {
+                DccTool.Photoshop => "Photoshop",
+                DccTool.SubstancePainter => "Substance 3D Painter",
+                _ => null
+            };
+
+            if (needle == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                return Process.GetProcesses().Any(p =>
+                {
+                    try
+                    {
+                        return p.ProcessName.Contains(needle, StringComparison.OrdinalIgnoreCase);
+                    }
+                    catch (Exception)
+                    {
+                        return false;   // access denied on some system processes
+                    }
+                });
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
 
         private static string ReadVersion(DccTool tool, string path)
         {

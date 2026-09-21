@@ -5,6 +5,35 @@ All notable changes to this package are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-09-22
+
+Photoshop is now driven, not just detected.
+
+### Added
+
+- **Photoshop ExtendScript bridge.** Runs a script inside a live Photoshop and returns what
+  it evaluated to — AppleScript on macOS, the COM automation object on Windows. Both are
+  Adobe-supported and need nothing beyond Photoshop itself.
+- `dcc_ps_describe` — report the open document, its size and layer count.
+- `dcc_ps_export_layers` — export each top-level layer as its own PNG. This is the handoff
+  the pipeline is built around: Photoshop authors a template once, its layers become flat
+  images, and a generator composites from them thousands of times with Photoshop closed.
+  Layer visibility is restored afterwards, so the artist's document is left as found.
+
+### Changed
+
+- **Photoshop readiness is now "is it running", not a port check.** The previous check
+  probed port 3001, which belongs to a third-party plugin proxy rather than to Photoshop —
+  it reported a bridge most users do not have. Photoshop has no remote-control server of its
+  own; it is scripted through the OS, so the package no longer assumes one exists.
+
+### Known limitations
+
+- `com.unity.pipeline` times out a command at 30s. Photoshop's **first** call in a session
+  can exceed that while macOS asks for Automation permission; approve the prompt and retry.
+  A document-heavy export may also need more than 30s.
+- Substance is detected and selectable, but no command drives it yet.
+
 ## [0.3.2] - 2026-09-22
 
 ### Fixed

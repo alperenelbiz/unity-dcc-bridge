@@ -21,9 +21,9 @@ unlocks more.
 
 Blender runs **headless** — driven in batch with no window, so it can do bulk work.
 
-Photoshop and Substance do **not**. Both are driven over a local socket against a running
-application (ports 3001 and 60041), and both stay silent unless launched with remote
-control enabled. That makes them the place to author one of a kind, not to produce a
+Photoshop and Substance do **not**. Photoshop is scripted through the OS against a running
+application, so it has to be open. Substance listens on port 60041, but only when launched
+with `--enable-remote-scripting`. That makes them the place to author one of a kind, not to produce a
 thousand: use them to design a template or paint a hero prop, and let the headless
 generators mass-produce from what they export.
 
@@ -32,10 +32,10 @@ generators mass-produce from what they export.
 Package Manager → **Add package from git URL**:
 
 ```
-https://github.com/alperenelbiz/unity-dcc-bridge.git?path=/Packages/com.alperenelbiz.dccbridge#v0.3.2
+https://github.com/alperenelbiz/unity-dcc-bridge.git?path=/Packages/com.alperenelbiz.dccbridge#v0.4.0
 ```
 
-Pin the tag. Without `#v0.3.2` you track the default branch and every fetch may bring
+Pin the tag. Without `#v0.4.0` you track the default branch and every fetch may bring
 breaking changes.
 
 To upgrade, change the tag and let the Package Manager re-resolve:
