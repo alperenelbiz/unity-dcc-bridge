@@ -118,6 +118,35 @@ namespace AlperenElbiz.DccBridge.Editor
         [MenuItem("Tools/DCC Bridge/Photoshop/Export Layers", true)]
         private static bool PhotoshopMenuEnabled() => DccBridgeSettings.Instance.IsUsable(DccTool.Photoshop);
 
+        [CliCommand("dcc_sp_status", "Report the Substance 3D Painter API version and open project.",
+            Tags = new[] { "dcc", "dcc/substance" })]
+        [MenuItem("Tools/DCC Bridge/Substance/Status", priority = 70)]
+        public static string SubstanceStatus() => Report(SubstanceBridge.Describe());
+
+        [CliCommand("dcc_sp_export",
+            "Export the open Substance project's textures into Assets/Art/Textures/Substance.",
+            Tags = new[] { "dcc", "dcc/substance" })]
+        [MenuItem("Tools/DCC Bridge/Substance/Export Textures", priority = 71)]
+        public static string SubstanceExport()
+        {
+            var target = System.IO.Path.Combine(
+                ToolRunner.ProjectRoot, "Assets", "Art", "Textures", "Substance");
+
+            // Metallic-roughness is Substance's own default. A URP project usually wants a
+            // metallic-smoothness preset instead; name it here once the shelf has one.
+            var result = SubstanceBridge.ExportTextures(target, "PBR Metallic Roughness");
+            if (result.Ok)
+            {
+                AssetDatabase.Refresh();
+            }
+
+            return Report(result);
+        }
+
+        [MenuItem("Tools/DCC Bridge/Substance/Status", true)]
+        [MenuItem("Tools/DCC Bridge/Substance/Export Textures", true)]
+        private static bool SubstanceMenuEnabled() => DccBridgeSettings.Instance.IsUsable(DccTool.SubstancePainter);
+
         [CliCommand("dcc_run_all", "Run every step available with the tools this project has enabled.",
             Tags = new[] { "dcc" })]
         [MenuItem("Tools/DCC Bridge/Run Everything", priority = 50)]

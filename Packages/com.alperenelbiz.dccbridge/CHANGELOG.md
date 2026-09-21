@@ -5,6 +5,36 @@ All notable changes to this package are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-09-22
+
+Substance 3D Painter is now driven. All three tools are wired.
+
+### Added
+
+- **Substance remote scripting bridge** over `POST localhost:60041/run.json`.
+- `dcc_sp_status` — API version and the open project.
+- `dcc_sp_export` — export the open project's texture sets.
+
+### Protocol notes
+
+Adobe's documentation page is not publicly reachable, so the protocol was established by
+probing a running instance. Two behaviours are worth recording because neither is obvious:
+
+- A **single expression** returns its value as JSON; a **multi-line script** runs but always
+  answers `null`. Anything needing a result has to ask for it separately.
+- The interpreter's **globals persist between calls**, which is what makes that split
+  workable: run the script, then read the variable it left behind.
+- Script errors arrive with **HTTP 200** and an error object in the body, so failure cannot
+  be detected from the status code.
+
+### Known limitations
+
+- `dcc_sp_export` has only been exercised with **no project open**, where it correctly
+  reports so. The actual export path is untested against a real Substance project.
+- The export preset is fixed to `PBR Metallic Roughness`, Substance's metallic-roughness
+  default. A URP project usually wants a metallic-smoothness preset instead; this should
+  become configurable once the shape of a real export is known.
+
 ## [0.4.0] - 2026-09-22
 
 Photoshop is now driven, not just detected.

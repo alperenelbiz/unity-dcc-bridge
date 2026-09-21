@@ -32,16 +32,16 @@ generators mass-produce from what they export.
 Package Manager → **Add package from git URL**:
 
 ```
-https://github.com/alperenelbiz/unity-dcc-bridge.git?path=/Packages/com.alperenelbiz.dccbridge#v0.4.0
+https://github.com/alperenelbiz/unity-dcc-bridge.git?path=/Packages/com.alperenelbiz.dccbridge#v0.5.0
 ```
 
-Pin the tag. Without `#v0.4.0` you track the default branch and every fetch may bring
+Pin the tag. Without `#v0.5.0` you track the default branch and every fetch may bring
 breaking changes.
 
 To upgrade, change the tag and let the Package Manager re-resolve:
 
 ```
-...#v0.4.0
+...#v0.5.0
 ```
 
 ## First run
